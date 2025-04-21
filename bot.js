@@ -1,20 +1,23 @@
 require("dotenv").config();
-const { Telegraf } = require("telegraf");
+const { Telegraf, Markup } = require("telegraf");
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
-// Replace this with the short name you registered in BotFather
+// Your Game short name from BotFather
 const GAME_SHORT_NAME = "BasFurolhi";
+
+// Your Web App URL hosted on Vercel
+const GAME_URL = "https://game-sbey.vercel.app/"; // Replace this!
 
 // Map to store the inline message ID per user for updating scores
 const userScores = new Map();
 
-// 🟢 Send the game when user starts the bot
+// 🟢 /start sends the game link
 bot.start((ctx) => {
   ctx.replyWithGame(GAME_SHORT_NAME);
 });
 
-// 🟢 Handle the button press when someone taps the Play button
+// 🟢 Handle auto-generated "Play" button from Telegram
 bot.on("callback_query", async (ctx) => {
   const callbackQuery = ctx.callbackQuery;
   const userId = ctx.from.id;
@@ -22,17 +25,27 @@ bot.on("callback_query", async (ctx) => {
   if (callbackQuery.game_short_name === GAME_SHORT_NAME) {
     const inlineMessageId = callbackQuery.inline_message_id;
 
-    // Store inline message ID for that user to update the score later
-    userScores.set(userId, inlineMessageId);
+    // Save inlineMessageId so we can update score later
+    if (inlineMessageId) {
+      userScores.set(userId, inlineMessageId);
+    }
 
-    // No need to answer callback if it's a game launch
+    // Intercept the button and send a proper Web App button instead
+    await ctx.answerCbQuery(); // Acknowledge the button
+
+    await ctx.reply("🎮 Click below to play BasFurolhi:", {
+      reply_markup: Markup.inlineKeyboard([
+        [Markup.button.webApp("Play BasFurolhi", GAME_URL)]
+      ])
+    });
+
     return;
   }
 
-  await ctx.answerCbQuery();
+  await ctx.answerCbQuery("Unknown game.");
 });
 
-// 🟢 Receive data from the Web App (score)
+// 🟢 Handle score submission from the web app
 bot.on("message", async (ctx) => {
   if (ctx.webAppData) {
     try {
@@ -42,26 +55,33 @@ bot.on("message", async (ctx) => {
 
       const inlineMessageId = userScores.get(userId);
       if (!inlineMessageId) {
-        return ctx.reply("Could not find your game session.");
+        return ctx.reply("❌ Could not find your game session.");
       }
 
-      // Update score
       await ctx.telegram.setGameScore(userId, score, {
         inline_message_id: inlineMessageId,
-        force: true,
+        force: true
       });
 
       ctx.reply(`✅ Your score of ${score} has been saved!`);
     } catch (error) {
-      console.error("Error setting score:", error);
+      console.error("Score error:", error);
       ctx.reply("❌ Failed to update score.");
     }
   }
 });
 
-// Start the bot
+// 🟢 Optional command to directly send the Web App button
+bot.command("playwebapp", (ctx) => {
+  ctx.reply("🎮 Click below to play BasFurolhi:", {
+    reply_markup: Markup.inlineKeyboard([
+      [Markup.button.webApp("Play BasFurolhi", GAME_URL)]
+    ])
+  });
+});
+
+// ✅ Start the bot
 bot.launch();
 
 process.once("SIGINT", () => bot.stop("SIGINT"));
 process.once("SIGTERM", () => bot.stop("SIGTERM"));
-
