@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="dv_MV" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>BasFurolhi</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+
+    <div id="loading-screen" class="screen">
+        <img src="gameLogo.jpg" alt="Loading Screen" id="loading-image">
+        <p>ލޯޑުކުރަނީ...</p> </div>
+
+    <div id="start-screen" class="screen">
+      <img src="gameLogo.jpg" alt="BasFurolhi Game Logo" class="game-logo">
+      
+      <div id="highscores-container">
+        <ol id="highscores-list"></ol>
+      </div>
+      
+      <!-- <p>ފަހުގެ ސްކޯ: <span id="last-score">0</span></p>  -->
+      
+      <button id="start-button">ކުޅެން ފަށާ</button> </div>
+
+    <div id="game-container" class="screen">
+        <img src="gameLogo.jpg" alt="BasFurolhi Game Logo" class="game-logo">
+
+        <div id="timer">ވަގުތު: <span id="time-left-span">20</span>s</div> <div id="scrambled-letters" class="letter-container">
+        </div>
+
+        <div id="answer-boxes" class="letter-container">
+        </div>
+
+        <div id="controls">
+            <button id="clear-button">ފޮހެލާ</button>
+        </div>
+
+        <div id="message"></div>
+        <div id="score">ސްކޯ: 0</div>
+
+    </div>
+
+    <div id="game-over-screen" class="screen">
+        <h2>ފުރޮޅާ ނިމިއްޖެ</h2> <p>ޖުމްލަ ސްކޯ: <span id="final-score-display">0</span></p> <p id="game-over-message"></p> <div class="game-over-buttons">
+            <button id="game-over-play-again">އަލުން ކުޅޭ</button> <button id="game-over-go-start">ފެށޭ ސްކްރީން</button> </div>
+    </div>
+
+
+    <script src="script.js"></script>
+</body>
+</html>
